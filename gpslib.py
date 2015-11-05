@@ -9,6 +9,9 @@ import threading
 gpsd      = None
 long      = None
 lat       = None
+climb     = None
+
+
 isRunning = False
 
 
@@ -25,13 +28,13 @@ class GpsPoller(threading.Thread):
 		self.running = True
 
 	def run(self):
-		global gpsd, long, lat
+		global gpsd, long, lat, climb
 		#looping = True
 		while gpsp.running:
 			gpsd.next()
 			lat = gpsd.fix.latitude
 			long = gpsd.fix.longitude
-			
+			climb = gpsd.fix.climb
 
 
 # Main action
@@ -61,6 +64,10 @@ def getLongitude():
 # Get the latest latitude
 def getLatitude():
 	return lat
+
+# Get the current height in meters (m)
+def getHeight():
+	return climb
 
 # Start by getting data from the GPS module
 def startGPS():
