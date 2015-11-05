@@ -1,8 +1,9 @@
-from gpsstatus import getStatus
-import time
+from gpslib import *
+
+startGPS()
 
 while True:
-	status = getStatus()
+	status = isGPSRunning()
 
 	print status
 

@@ -2,13 +2,14 @@ import os
 import time
 import sys
 from gps import *
-from gpspoller import GpsPoller
+#from gpspoller import GpsPoller
 import threading
 
 # Setting empty variables before polling for GPS data!
-gpsd     = None
-long     = None
-lat      = None
+gpsd      = None
+long      = None
+lat       = None
+isRunning = False
 
 
 # The actual GPS poller, polls the GPS module for new data
@@ -25,26 +26,29 @@ class GpsPoller(threading.Thread):
 
 	def run(self):
 		global gpsd, long, lat
-		looping = True
+		#looping = True
 		while gpsp.running:
-			try:
-				gpsd.next()
-				long = gpsd.fix.latitude
-				lat = gpsd.fix.longitude
-		        except (KeyboardInterrupt, SystemExit):
-				print "Pressed! 1"
-                		gpsp.running = False
+			gpsd.next()
+			lat = gpsd.fix.latitude
+			long = gpsd.fix.longitude
+			
 
 
 # Main action
 if __name__ == "__main__":
+	print "Hello"
 	gpsp = GpsPoller()
 	gpsp.start()
+
+	while True:
+		print "Latitude: ", gpsd.fix.latitude
+                print "Longitude: ", gpsd.fix.longitude
+
 
 # Check if the GPS module is running properly
 def isGPSRunning():
 	# Check for GPS status
-        if str(lat) == "nan" or lat == 0.0:
+        if str(lat) == "nan" or lat == 0.0 or lat == None:
        		return False
        	else:
              	return True		
@@ -57,3 +61,14 @@ def getLongitude():
 # Get the latest latitude
 def getLatitude():
 	return lat
+
+# Start by getting data from the GPS module
+def startGPS():
+	global isRunning, gpsp
+	if isRunning == False:
+		# Start up the GPS poller
+		gpsp = GpsPoller()
+		gpsp.start()
+
+		isRunning == True
+
