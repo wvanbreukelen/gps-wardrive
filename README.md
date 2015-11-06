@@ -1,5 +1,5 @@
 # gps-wardrive
-GPS library voor wardriving. Voor PWS
+GPS library voor wardriving. Met specifieke reden gemaakt, namelijk het profielwerkstuk voor 5 HAVO
 
 ## Installatie
 
@@ -17,7 +17,8 @@ Voer het onderstaande command in
 sudo pip install wifi
 ```
 
-Wanneer deze stappen zijn voltooid is het mogelijk om gps-wardrive zelf te installeren
+Wanneer deze stappen zijn voltooid is het mogelijk om gps-wardrive zelf te installeren.
+
 Voer het onderstaande commando uit in de map zelf:
 
 ```
@@ -35,6 +36,11 @@ sudo python test.py
 
 ## Stoppen
 Om gps-wardrive te starten wordt er het volgende commando gebruikt.
+
 LET OP! Dit is noodzakelijk, anders is het mogelijk dat er databasebestanden overschreven raken
 
 In de toekomst kan dit worden geautomatiseerd.
+
+## Over gps-wardrive
+
+GPS Wardrive is uitgegeven onder een GPLv3 licensie.
