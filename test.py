@@ -1,9 +1,25 @@
 from gpslib import *
+from wifilib import *
 import sqlite3 as sql
 import sys
+import os
+
+# Check if python has root permissions
+if os.getuid() != 0:
+	print("Please run as root!")
+	sys.exit(1)
 
 # Start the GPS logger
 startGPS()
+print "Starting wifi... This process can take a couple of seconds"
+startWifi()
+
+while True:
+	if isWifiRunning():
+		break;
+	time.sleep(0.5)
+
+print "[SUCCESS] Started wifi!"
 
 print "Waiting for GPS fix..."
 
@@ -17,10 +33,10 @@ while True:
 	time.sleep(0.5)
 
 # Print out some basic info
-print "GPS fix successfully found!"
+print "[SUCCESS] GPS fix successfully found!"
+
 print "Longitude: ", getLongitude()
 print "Latitude: ", getLatitude()
-print "Height in meters: ", getHeight()
 
 # Try to create a sqlite DB connection
 try:
@@ -28,10 +44,12 @@ try:
 
 	cur = con.cursor()
 except sql.Error, e:
-	print "Error creating DB conn %s:" % e.args[0]
+	print "[ERROR] Error creating DB conn %s:" % e.args[0]
 	sys.exit(1)
 
-# Start to log the GPS information to a XML file
+latestSSIDs = []
+
+# Start to log the GPS information to a database
 while True:
 	lon = str(getLongitude())
 	lat = str(getLatitude())
@@ -39,15 +57,30 @@ while True:
 	curdate = str(time.strftime("%x"))
 	curtime = str(time.strftime("%X"))
 
-	statement = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb +", '" + curtime + "', '" + curdate + "')"
-	cur.execute(statement)
+	# Get Wifi stuff
+	wifistuff = getLatestPolledNetworks()
+	encryptions = countEncryptionTypes(wifistuff)
+	amount = len(wifistuff)
+
+	# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
+	statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
+	try:
+		cur.execute(statement1)
+	except (OperationalError):
+		print "[WARNING] Cannot log gps instance!"
+
+	for network in wifistuff:
+		if network.ssid in latestSSIDs:
+			amount = amount - 1
+		else:
+			networkType = getEncryptionType(network)
+			latestSSIDs.append(network.ssid)
+
+			# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
+			statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
+			cur.execute(statement2)
+
+	print "Received " + str(amount) + " wifi points!"
+
 	con.commit()
-	print "Logged to DB!"
-
 	time.sleep(5)
-
-#print "Waiting for WiFi connection..."
-
-#while True:
-	# Check if there is a WiFi connection, if so, break
-	#time.sleep(0.5)
