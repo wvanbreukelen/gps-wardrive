@@ -7,9 +7,10 @@ import threading
 
 # Setting empty variables before polling for GPS data!
 gpsd      = None
-long      = None
-lat       = None
-climb     = None
+long      = None # Location longitude	
+lat       = None # Location latitude
+climb     = None # Climb height in meters
+speed     = None # Speed in mp/h (need to convert to km/h, multiply with 1.6??!)
 
 
 isRunning = False
