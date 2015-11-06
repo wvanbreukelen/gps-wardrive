@@ -7,7 +7,7 @@ import threading
 
 # Setting empty variables before polling for GPS data!
 gpsd      = None
-long      = None # Location longitude	
+long      = None # Location longitude
 lat       = None # Location latitude
 climb     = None # Climb height in meters
 speed     = None # Speed in mp/h (need to convert to km/h, multiply with 1.6??!)
@@ -55,7 +55,7 @@ def isGPSRunning():
         if str(lat) == "nan" or lat == 0.0 or lat == None:
        		return False
        	else:
-             	return True		
+             	return True
 
 
 # Get the latest longitude
@@ -79,4 +79,3 @@ def startGPS():
 		gpsp.start()
 
 		isRunning == True
-
