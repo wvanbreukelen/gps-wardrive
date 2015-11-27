@@ -41,6 +41,10 @@ LET OP! Dit is noodzakelijk, anders is het mogelijk dat er databasebestanden ove
 
 In de toekomst kan dit worden geautomatiseerd.
 
+## Todo lijstje
+
+Zie het TODO.md bestand
+
 ## Over gps-wardrive
 
 GPS Wardrive is uitgegeven onder een GPLv3 licensie.
