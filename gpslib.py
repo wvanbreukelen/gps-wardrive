@@ -74,8 +74,13 @@ def getHeight():
 def startGPS():
 	global isRunning, gpsp
 	if isRunning == False:
-		# Start up the GPS poller
-		gpsp = GpsPoller()
-		gpsp.start()
+		try:
+			# Start up the GPS poller
+			gpsp = GpsPoller()
+			gpsp.start()
+		except (socket.error):
+			print "Cannot start GPS! Please run gpsp!"
+			print "Stacktrace: ", traceback.format_exc()
+			sys.exit(1)
 
 		isRunning == True

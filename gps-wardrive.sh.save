@@ -1,0 +1,9 @@
+#!/usr/bin/env
+echo Starting gpsd deamon...
+sudo pkill -9 gpsdgpsd /dev/ttyAMA0 -F /var/run/gpsd.sock
+sleep 3
+echo Started gpsd deamon!
+echo Starting gps-wardrive...
+sudo pkill -9 python
+sudo python wardrive.py &
+echo Succesfully started gps-wardrive!

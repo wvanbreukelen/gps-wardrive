@@ -3,6 +3,7 @@ from wifilib import *
 import sqlite3 as sql
 import sys
 import os
+import traceback
 
 # Check if python has root permissions
 if os.getuid() != 0:
@@ -40,11 +41,12 @@ print "Latitude: ", getLatitude()
 
 # Try to create a sqlite DB connection
 try:
-	con = sql.connect('wardrive.db')
+	con = sql.connect('/home/pi/gps-wardrive/wardrive.db')
 
 	cur = con.cursor()
 except sql.Error, e:
 	print "[ERROR] Error creating DB conn %s:" % e.args[0]
+	print "Stacktrace: ", traceback.format_exc()
 	sys.exit(1)
 
 latestSSIDs = []
@@ -64,21 +66,23 @@ while True:
 
 	# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
 	statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
-	try:
-		cur.execute(statement1)
-	except (OperationalError):
-		print "[WARNING] Cannot log gps instance!"
+
+	cur.execute(statement1)
+
 
 	for network in wifistuff:
-		if network.ssid in latestSSIDs:
-			amount = amount - 1
-		else:
-			networkType = getEncryptionType(network)
-			latestSSIDs.append(network.ssid)
+		try:
+			if network.ssid in latestSSIDs:
+				amount = amount - 1
+			else:
+				networkType = getEncryptionType(network)
+				latestSSIDs.append(network.ssid)
 
-			# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
-			statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
-			cur.execute(statement2)
+				# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
+				statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
+				cur.execute(statement2)
+		except (AttributeError):
+			print "[WARNING] Cannot grab wifi SSID attribute!"
 
 	print "Received " + str(amount) + " wifi points!"
 

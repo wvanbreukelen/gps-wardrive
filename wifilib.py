@@ -1,16 +1,53 @@
 #!/usr/bin/env python
 
+
+# Import the required libraries
 import os
 import sys
+import time
+import threading
 from wifi import Cell, Scheme
+from wifi.exceptions import InterfaceError
 
 # The wifi interface
 interface = 'wlan0'
 
-# Check if python has root permissions
-if os.getuid() != 0:
-	print("Please run as root!")
-	sys.exit(1)
+# The latest scanned networks
+latestNetworks = None
+
+class WifiPoller(threading.Thread):
+	def __init__(self):
+		threading.Thread.__init__(self)
+		self.running = True
+
+	def run(self):
+		global latestNetworks
+		while self.running:
+			try:
+				latest = None
+				try:
+					latest = scanForNetworks()
+				except (InterfaceError):
+					print "[ERROR] Cannot find new networks right now, try again next time..."
+				latestNetworks = latest
+			except (KeyboardInterrupt, SystemExit):
+				self.running = False
+				self.join()
+
+			time.sleep(0.3)
+
+def startWifi():
+	wifip = WifiPoller()
+	wifip.start()
+
+def isWifiRunning():
+	if latestNetworks == None:
+		return False
+	return True
+
+# Get the latest scanned wifi networks
+def getLatestPolledNetworks():
+	return latestNetworks
 
 # Scan for wireless networks
 def scanForNetworks():
@@ -18,15 +55,21 @@ def scanForNetworks():
 
 # Scan all wireless networks for their encryption type
 def scanEncryption():
-	# Variables
+	cells = scanForNetworks()
+
+	return countEncryptionTypes(cells)
+
+def countEncryptionTypes(networks):
+	# Constants
 	encWPA2 = 0
 	encWPA = 0
 	encWEP = 0
 	encNone = 0
 
-	cells = scanForNetworks()
+	if networks == None:
+		return;
 
-	for network in cells:
+	for network in networks:
 		encryption = getEncryptionType(network)
 
 		if encryption == "wpa2":
@@ -38,9 +81,9 @@ def scanEncryption():
 		elif encryption == Null:
 			encNone = encNone + 1
 		else:
-			print "Encryption type cannot been resolved, type of ", encryption
+			print "Encryption type cannot been resolved, type of: ", encryption
 
-	return (encWPA2, encWPA, encWEP, encNone)
+	return [encWPA2, encWPA, encWEP, encNone]
 
 # Get the encryption type of a wireless network
 def getEncryptionType(network):

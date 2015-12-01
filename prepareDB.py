@@ -2,7 +2,7 @@ import sqlite3 as sql
 import sys
 import os.path
 
-file = 'wardrive.db'
+file = '/home/pi/gps-wardrive/wardrive.db'
 
 con = sql.connect(file)
 
