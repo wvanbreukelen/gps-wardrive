@@ -19,7 +19,7 @@ sudo pip install wifi
 
 Wanneer deze stappen zijn voltooid is het mogelijk om gps-wardrive zelf te installeren.
 
-Voer het onderstaande commando uit in de map zelf:
+Voer het onderstaande commando uit in de map waarin je gps-wardrive geplaatst heb:
 
 ```
 sudo python prepareDB.py
@@ -31,11 +31,18 @@ De benodigde database bestanden zullen nu aangemaakt worden
 Om gps-wardrive te starten wordt het volgende commando gebruikt
 
 ```
-sudo python test.py
+sudo bash gps-wardrive.sh
 ```
+
+Gps-wardrive zal nu proberen om het benodigde WiFi en GPS signaal te pakken te krijgen.
+Dit kan even duren, heb geduld...
 
 ## Stoppen
 Om gps-wardrive te starten wordt er het volgende commando gebruikt.
+
+```
+sudo pkill gps-wardrive
+```
 
 LET OP! Dit is noodzakelijk, anders is het mogelijk dat er databasebestanden overschreven raken
 
@@ -47,4 +54,5 @@ Zie het TODO.md bestand
 
 ## Over gps-wardrive
 
-GPS Wardrive is uitgegeven onder een GPLv3 licensie.
+Gps-wardrrive is ontwikkeld door wvanbreukelen en uitgegeven onder GPLv3 licensie.
+
