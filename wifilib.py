@@ -15,6 +15,8 @@ interface = 'wlan0'
 # The latest scanned networks
 latestNetworks = None
 
+# Wifi library
+
 class WifiPoller(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
@@ -22,13 +24,25 @@ class WifiPoller(threading.Thread):
 
 	def run(self):
 		global latestNetworks
+		global wifip
+
+		hotfix = False
 		while self.running:
+
 			try:
 				latest = None
+
 				try:
 					latest = scanForNetworks()
+
+					hotfix = False
 				except (InterfaceError):
-					print "[ERROR] Cannot find new networks right now, try again next time..."
+					print "[ERROR] Cannot find new networks right now, trying to make it work..."
+					if hotfix == False:
+						print "Doing the hotfix..."
+						os.system("sudo ifconfig wlan0 up")
+						time.sleep(2)
+						hotfix = True
 				latestNetworks = latest
 			except (KeyboardInterrupt, SystemExit):
 				self.running = False
@@ -72,13 +86,15 @@ def countEncryptionTypes(networks):
 	for network in networks:
 		encryption = getEncryptionType(network)
 
+		print encryption
+
 		if encryption == "wpa2":
 			encWPA2 = encWPA2 + 1
 		elif encryption == "wpa":
 			encWPA = encWPA + 1
 		elif encryption == "wep":
 			encWEP = encWEP + 1
-		elif encryption == Null:
+		elif encryption == "none":
 			encNone = encNone + 1
 		else:
 			print "Encryption type cannot been resolved, type of: ", encryption

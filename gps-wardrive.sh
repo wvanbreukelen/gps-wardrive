@@ -1,4 +1,8 @@
 #!/usr/bin/env
+sleep 10s
+sudo pkill -9 python
+sudo pkill -9 iw
+sudo ifconfig wlan0 up
 echo Starting gpsd deamon...
 sudo pkill -9 gpsd
 sudo gpsd /dev/ttyAMA0 -F /var/run/gpsd.sock

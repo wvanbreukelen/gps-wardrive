@@ -62,29 +62,38 @@ while True:
 	# Get Wifi stuff
 	wifistuff = getLatestPolledNetworks()
 	encryptions = countEncryptionTypes(wifistuff)
-	amount = len(wifistuff)
 
-	# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
-	statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
+	try:
+		amount = len(wifistuff)
 
-	cur.execute(statement1)
+		# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
+		statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
+
+		cur.execute(statement1)
 
 
-	for network in wifistuff:
-		try:
-			if network.ssid in latestSSIDs:
-				amount = amount - 1
-			else:
-				networkType = getEncryptionType(network)
-				latestSSIDs.append(network.ssid)
+		for network in wifistuff:
+			try:
+				if network.ssid in latestSSIDs:
+					amount = amount - 1
+				else:
+					networkType = getEncryptionType(network)
+					latestSSIDs.append(network.ssid)
 
-				# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
-				statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
-				cur.execute(statement2)
-		except (AttributeError):
-			print "[WARNING] Cannot grab wifi SSID attribute!"
+					# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
+					statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
+					try:
+						cur.execute(statement2)
+					except (sqlite3.OperationalError):
+						print "Exception was thrown during sqlite statement!"
+			except (AttributeError):
+				print "[WARNING] Cannot grab wifi SSID attribute! Restarting..."
+				os.system("sudo bash /home/pi/gps-wardrive/gps-wardrive.sh")
 
-	print "Received " + str(amount) + " wifi points!"
+		print "Received " + str(amount) + " wifi points!"
 
-	con.commit()
-	time.sleep(5)
+		con.commit()
+
+		time.sleep(5)
+	except TypeError:
+		print "[ERROR] Wifi array is empty, try again next time..."
