@@ -45,4 +45,4 @@ while True:
 		print "Error in processing result, unknown encryption type: " + str(row[2])
 
 
-kml.save("test.kml")
+kml.save("test_1.kml")

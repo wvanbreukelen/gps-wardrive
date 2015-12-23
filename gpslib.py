@@ -4,6 +4,7 @@ import sys
 from gps import *
 #from gpspoller import GpsPoller
 import threading
+import traceback
 
 # Setting empty variables before polling for GPS data!
 gpsd      = None
