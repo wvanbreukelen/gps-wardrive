@@ -64,36 +64,44 @@ while True:
 	encryptions = countEncryptionTypes(wifistuff)
 
 	try:
-		amount = len(wifistuff)
+		if wifistuff is not None:
+			
+			amount = len(wifistuff)
 
-		# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
-		statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
+			# id INTEGER PRIMARY KEY, longitude TEXT, latitude TEXT, climb TEXT, time TEXT, date TEXT)
+			statement1 = "INSERT INTO gpslog VALUES (NULL, " + lon + ", " + lat + ", " + climb + ", '" + curtime + "', '" + curdate + "')"
 
-		cur.execute(statement1)
-
-
-		for network in wifistuff:
 			try:
-				if network.ssid in latestSSIDs:
-					amount = amount - 1
-				else:
-					networkType = getEncryptionType(network)
-					latestSSIDs.append(network.ssid)
+				cur.execute(statement1)
+			except (sql.OperationalError):
+				print "Error running statement 1!"
+				print "Stacktrace: ", traceback.format_exc()
+			
+			for network in wifistuff:
+				try:
+					if network.ssid in latestSSIDs:
+						amount = amount - 1
+					else:
+						networkType = getEncryptionType(network)
+						latestSSIDs.append(network.ssid)
 
-					# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
-					statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
-					try:
-						cur.execute(statement2)
-					except (sqlite3.OperationalError):
-						print "Exception was thrown during sqlite statement!"
-			except (AttributeError):
-				print "[WARNING] Cannot grab wifi SSID attribute! Restarting..."
-				os.system("sudo bash /home/pi/gps-wardrive/gps-wardrive.sh")
+						# id INTEGER PRIMARY KEY, ssid TEXT, encryption TEXT, longitude TEXT, latitude TEXT, time TEXT, date TEXT)
+						statement2 = "INSERT INTO network VALUES (NULL, '" + network.ssid + "', '" + networkType + "', '" + lon + "', '" + lat + "', '" + curtime + "', '" + curdate + "')"
+						try:
+							cur.execute(statement2)
+						except (sql.OperationalError):
+							print "Exception was thrown during sqlite statement!"
+				except (AttributeError):
+					print "[WARNING] Cannot grab wifi SSID attribute!"
+					#print network.ssid
+					print "Stacktrace: ", traceback.format_exc()
+					#os.system("sudo bash /home/pi/gps-wardrive/gps-wardrive.sh")
 
-		print "Received " + str(amount) + " wifi points!"
+			print "Received " + str(amount) + " wifi points!"
 
-		con.commit()
+			con.commit()
 
-		time.sleep(5)
+			time.sleep(5)
 	except TypeError:
 		print "[ERROR] Wifi array is empty, try again next time..."
+		print "Stacktrace: ", traceback.format_exc() 

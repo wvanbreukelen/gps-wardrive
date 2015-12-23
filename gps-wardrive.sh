@@ -11,5 +11,5 @@ echo Started gpsd deamon!
 echo Starting gps-wardrive...
 sudo pkill -9 python
 #sudo python /home/pi/gps-wardrive/prepareDB.py
-sudo python /home/pi/gps-wardrive/wardrive.py > /home/pi/final_log.txt 2>&1 &
+sudo stdbuf -oL python /home/pi/gps-wardrive/wardrive.py > /home/pi/final_log.txt 2>&1 &
 echo Succesfully started gps-wardrive!
