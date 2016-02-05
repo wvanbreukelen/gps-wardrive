@@ -38,7 +38,7 @@ Gps-wardrive zal nu proberen om het benodigde WiFi en GPS signaal te pakken te k
 Dit kan even duren, heb geduld...
 
 ## Stoppen
-Om gps-wardrive te stopper wordt er het volgende commando gebruikt.
+Om gps-wardrive te stoppen wordt er het volgende commando gebruikt.
 
 ```
 sudo pkill gps-wardrive
