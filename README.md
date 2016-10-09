@@ -1,5 +1,5 @@
 # gps-wardrive
-GPS library voor wardriving. Met specifieke reden gemaakt, namelijk het profielwerkstuk voor 5 HAVO
+GPS library voor wardriving.
 
 ## Installatie
 
